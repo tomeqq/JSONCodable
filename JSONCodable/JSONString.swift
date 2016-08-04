@@ -16,7 +16,7 @@ public extension JSONEncodable {
         case is Bool, is Int, is Float, is Double:
             return String(self)
         default:
-            let json = try toJSON()
+            let json = try toJSON([])
             #if !swift(>=3.0)
             let data = try NSJSONSerialization.dataWithJSONObject(json, options: NSJSONWritingOptions(rawValue: 0))
             #else

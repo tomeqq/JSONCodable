@@ -31,15 +31,15 @@ We'll add conformance to `JSONEncodable`. You may also add conformance to `JSONC
 */
 
 extension User: JSONEncodable {
-  func toJSON() throws -> AnyObject {
-    return try JSONEncoder.create({ (encoder) -> Void in
-      try encoder.encode(id, key: "id")
-      try encoder.encode(name, key: "full_name")
-      try encoder.encode(email, key: "email")
-      try encoder.encode(company, key: "company")
-      try encoder.encode(friends, key: "friends")
-    })
-  }
+    func toJSON(options: JSONEncodingOptions) throws -> AnyObject {
+        return try JSONEncoder.create(options) { (encoder) -> Void in
+            try encoder.encode(id, key: "id")
+            try encoder.encode(name, key: "full_name")
+            try encoder.encode(email, key: "email")
+            try encoder.encode(company, key: "company")
+            try encoder.encode(friends, key: "friends")
+        }
+    }
 }
 
 extension Company: JSONEncodable {}
@@ -54,22 +54,22 @@ We'll add conformance to `JSONDecodable`. You may also add conformance to `JSONC
 */
 
 extension User: JSONDecodable {
-  init(object: JSONObject) throws {
-    let decoder = JSONDecoder(object: object)
-    id = try decoder.decode("id")
-    name = try decoder.decode("full_name")
-    email = try decoder.decode("email")
-    company = try decoder.decode("company")
-    friends = try decoder.decode("friends")
-  }
+    init(object: JSONObject) throws {
+        let decoder = JSONDecoder(object: object)
+        id = try decoder.decode("id")
+        name = try decoder.decode("full_name")
+        email = try decoder.decode("email")
+        company = try decoder.decode("company")
+        friends = try decoder.decode("friends")
+    }
 }
 
 extension Company: JSONDecodable {
-  init(object: JSONObject) throws {
-    let decoder = JSONDecoder(object: object)
-    name = try decoder.decode("name")
-    address = try decoder.decode("address")
-  }
+    init(object: JSONObject) throws {
+        let decoder = JSONDecoder(object: object)
+        name = try decoder.decode("name")
+        address = try decoder.decode("address")
+    }
 }
 
 /*:
@@ -105,7 +105,8 @@ We can instantiate `User` using one of provided initializers:
 - `init?(JSONString: String)`
 */
 
-let user = try! User(object: JSON)
+var user = try! User(object: JSON)
+
 print("Decoded: \n\(user)\n\n")
 
 /*:
@@ -114,5 +115,20 @@ And encode it to JSON using one of the provided methods:
 - `func JSONString() throws -> String`
 */
 
-let dict = try! user.toJSON()
-print("Encoded: \n\(dict as! JSONObject)\n\n")
+do {
+    let dict = try user.toJSON([])
+    print("Encoded: \n\(dict as! JSONObject)\n\n")
+}
+catch {
+    print("Error: \(error)")
+}
+
+//do {
+//    let string = try user.JSONString()
+//    print(string)
+//
+//    let userAgain = User(JSONString: string)
+//    print(userAgain)
+//} catch {
+//    print("Error: \(error)")
+//}
